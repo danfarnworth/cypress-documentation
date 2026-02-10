@@ -458,7 +458,7 @@ want to modify the behavior of a query, you'll need to use
 
 ```javascript
 Cypress.Commands.overwrite('visit', (originalFn, url, options) => {
-  const domain = Cypress.env('BASE_DOMAIN')
+  const domain = Cypress.expose('BASE_DOMAIN')
 
   if (domain === '...') {
     url = '...'
@@ -894,9 +894,7 @@ and unnecessary. Try to take as many shortcuts as possible.
 #### 5. Write TypeScript definitions
 
 You can describe the method signature for your custom command, allowing
-IntelliSense to show helpful documentation. See the
-[`cypress-example-todomvc`](https://github.com/cypress-io/cypress-example-todomvc#cypress-intellisense)
-repository for a working example.
+IntelliSense to show helpful documentation.
 
 #### 6. Create a function that adds the custom command
 

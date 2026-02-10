@@ -67,10 +67,11 @@ The key to press. Values for non single character keys are available on [`Cypres
 | Letters                           | `"a"` through `"z"`, `"A"` through `"Z"`                             |
 | Numbers                           | `"0"`, `"1"`, `"2"`, `"3"`, `"4"`, `"5"`, `"6"`, `"7"`, `"8"`, `"9"` |
 | Special Characters                | `"!"`, `"@"`, `"#"`, `'+'`, `"€"`, `"é"`, etc.                       |
+| `Cypress.Keyboard.Keys.UP`        | `"ArrowUp"`                                                          |
 | `Cypress.Keyboard.Keys.DOWN`      | `"ArrowDown"`                                                        |
 | `Cypress.Keyboard.Keys.LEFT`      | `"ArrowLeft"`                                                        |
 | `Cypress.Keyboard.Keys.RIGHT`     | `"ArrowRight"`                                                       |
-| `Cypress.Keyboard.Keys.UP`        | `"ArrowUp"`                                                          |
+| `Cypress.Keyboard.Keys.ESC`       | `"Escape"`                                                           |
 | `Cypress.Keyboard.Keys.END`       | `"End"`                                                              |
 | `Cypress.Keyboard.Keys.HOME`      | `"Home"`                                                             |
 | `Cypress.Keyboard.Keys.PAGEDOWN`  | `"PageDown"`                                                         |
@@ -151,6 +152,23 @@ cy.press('́') // \u0301 (combining acute accent)
 
 ## Notes
 
+### When to use cy.type()
+
+While `.press()` dispatches native keyboard events, use [`cy.type()`](/api/commands/type) for:
+
+- **Text input**: Typing multiple characters or words
+- **Special character sequences**: `{backspace}`, `{selectAll}`, `{moveToEnd}`
+- **Modifier combinations**: `{ctrl}c`, `{shift}b`
+- **Form filling**: When you need to simulate specific timing of typing behavior
+
+```javascript
+// Use .press() for single key events
+cy.press(Cypress.Keyboard.Keys.TAB)
+
+// Use .type() for text and complex sequences
+cy.get('input').type('Hello{backspace}World')
+```
+
 ### Strings with multiple characters
 
 Strings with multiple characters are not supported. If you need to input longer strings into a text input or similar, use [`cy.type()`](/api/commands/type).
@@ -169,12 +187,15 @@ If your application prevents the default behavior of the `beforeunload` event, t
 
 | Version                             | Changes                                                                             |
 | ----------------------------------- | ----------------------------------------------------------------------------------- |
-| [14.3.0](/app/references/changelog) | Added the `.press()` command                                                        |
+| [15.3.0](/app/references/changelog) | Added support for `{esc}` key.                                                      |
 | [15.1.0](/app/references/changelog) | Expanded support to include named keys and single+multi-codepoint UTF-8 characters. |
+| [14.3.0](/app/references/changelog) | Added the `.press()` command                                                        |
 
 ## See also
 
-- [`Cypress.Keyboard`](/api/cypress-api/keyboard-api)
-- [`.focus()`](/api/commands/focus)
-- [`.focused()`](/api/commands/focused)
-- [`.type()`](/api/commands/type)
+- [`cy.type()`](/api/commands/type) - For typing text and special sequences
+- [`.focus()`](/api/commands/focus) - Focus elements before pressing keys
+- [`.focused()`](/api/commands/focused) - Assert focused elements
+- [`.click()`](/api/commands/click) - Click elements
+- [`Cypress.Keyboard`](/api/cypress-api/keyboard-api) - Keyboard constants
+- [Accessibility Testing Guide](/app/guides/accessibility-testing) - Keyboard navigation patterns

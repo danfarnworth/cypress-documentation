@@ -207,7 +207,8 @@ cypress run [options]
 | `--config`, `-c`               | [Specify configuration](#cypress-run-config-lt-config-gt)                                                                                                                                     |
 | `--config-file`, `-C`          | [Specify configuration file](#cypress-run-config-file-lt-configuration-file-gt)                                                                                                               |
 | `--e2e`                        | Run end to end tests (default)                                                                                                                                                                |
-| `--env`, `-e`                  | [Specify environment variables](#cypress-run-env-lt-env-gt)                                                                                                                                   |
+| `--env`, `-e`                  | [Specify secret environment variables](#cypress-run-env-lt-env-gt)                                                                                                                            |
+| `--expose`, `-x`               | [Specify public configuration values](#cypress-run-expose-lt-expose-gt)                                                                                                                       |
 | `--group`                      | [Group recorded tests together under a single run](#cypress-run-group-lt-name-gt)                                                                                                             |
 | `--headed`                     | [Displays the browser instead of running headlessly](#cypress-run-headed)                                                                                                                     |
 | `--headless`                   | Hide the browser instead of running headed (default during `cypress run`)                                                                                                                     |
@@ -217,6 +218,7 @@ cypress run [options]
 | `--no-runner-ui`               | [Hides the Cypress Runner UI](#cypress-run-no-runner-ui)                                                                                                                                      |
 | `--parallel`                   | [Run recorded specs in parallel across multiple machines](#cypress-run-parallel)                                                                                                              |
 | `--port`,`-p`                  | [Override default port](#cypress-run-port-lt-port-gt)                                                                                                                                         |
+| `--posix-exit-codes`           | [Exit with a POSIX-compliant exit code](#cypress-run-posix-exit-codes) rather than the number of failed tests.                                                                                |
 | `--project`, `-P`              | [Path to a specific project](#cypress-run-project-lt-project-path-gt)                                                                                                                         |
 | `--quiet`, `-q`                | [Reduce output to `stdout`](#cypress-run-quiet)                                                                                                                                               |
 | `--record`                     | [Whether to record the test run](#cypress-run-record-key-lt-record-key-gt)                                                                                                                    |
@@ -227,8 +229,6 @@ cypress run [options]
 | `--tag`, `-t`                  | [Identify a run with a tag or tags](#cypress-run-tag-lt-tag-gt)                                                                                                                               |
 
 #### `cypress run --auto-cancel-after-failures <autoCancelAfterFailures>` {#auto-cancel-after-runs}
-
-> Note: Available in Cypress 12.6.0 and later
 
 The "autoCancelAfterFailures" argument is the number of times tests can fail
 before the run is canceled
@@ -270,7 +270,7 @@ cypress run --browser /usr/bin/chromium
 This value should be automatically detected for most CI providers and is
 unnecessary to define unless Cypress is unable to determine it.
 
-Typically, this is defined as an environment variable within your CI provider,
+Typically, this is defined as a system environment variable within your CI provider,
 defining a unique "build" or "run".
 
 ```shell
@@ -317,14 +317,16 @@ Examples:
     inline="true"
     callout="npm scripts"
     url="https://github.com/cypress-io/cypress-realworld-app/blob/07a6483dfe7ee44823380832b0b23a4dacd72504/package.json#L120"
-  /> to run Cypress in mobile viewport.
+  />
+  to run Cypress in mobile viewport.
 
 - <Icon
     name="github"
     inline="true"
     callout="Circle CI job configuration"
     url="https://github.com/cypress-io/cypress-realworld-app/blob/07a6483dfe7ee44823380832b0b23a4dacd72504/.circleci/config.yml#L82-L100"
-  /> for running test suites in mobile viewport.
+  />
+  for running test suites in mobile viewport.
 
 :::
 
@@ -339,23 +341,39 @@ cypress run --config-file tests/cypress.config.js
 
 #### `cypress run --env <env>` {#cypress-run-env-lt-env-gt}
 
-Set Cypress [environment variables](/app/references/environment-variables).
+:::caution
+
+**Security Warning**
+
+Secrets passed via CLI may appear in CI logs. For production use, prefer setting secrets via your CI/CD platform's secret management system.
+
+:::
+
+Set secret [environment variables](/app/guides/environment-variables) for use in your tests via [`cy.env()`](/api/commands/env). See the [Environment Variables & Secrets](/app/guides/environment-variables) guide for more details.
 
 ```shell
-cypress run --env host=api.dev.local
+cypress run --env apiKey=secret-key-12345
 ```
 
 Pass several variables using commas and no spaces. Numbers are automatically
 converted from strings.
 
 ```shell
-cypress run --env host=api.dev.local,port=4222
+cypress run --env apiKey=secret-key-12345,apiUrl=https://api.example.com
 ```
 
 Pass an object as a JSON in a string.
 
 ```shell
-cypress run --env flags='{"feature-a":true,"feature-b":false}'
+cypress run --env credentials='{"apiKey":"secret-key-12345","dbPassword":"secure-password"}'
+```
+
+#### `cypress run --expose <expose>` {#cypress-run-expose-lt-expose-gt}
+
+Set public configuration values for use in your tests via [`Cypress.expose()`](/api/cypress-api/expose). See the [Environment Variables & Secrets](/app/guides/environment-variables) guide for more details.
+
+```shell
+cypress run --expose apiVersion=v2,featureFlag=true
 ```
 
 #### `cypress run --group <name>` {#cypress-run-group-lt-name-gt}
@@ -439,6 +457,14 @@ documentation to learn more.
 cypress run --port 8080
 ```
 
+#### `cypress run --posix-exit-codes` {#cypress-run-posix-exit-codes}
+
+This changes the default behavior of Cypress regarding exit codes. This flag causes Cypress to exit with POSIX exit code of 1 when there are test failures or if Cypress could not run, rather than the number of tests that failed. It can return additional POSIX-compliant exit codes for other scenarios as well. See the [Exit Code section](/app/references/command-line#Exit-code) for a comprehensive reference of Cypress exit codes.
+
+```shell
+cypress run --posix-exit-codes
+```
+
 #### `cypress run --project <project-path>` {#cypress-run-project-lt-project-path-gt}
 
 To see this in action we've set up an
@@ -473,7 +499,7 @@ cypress run --record --key <record_key>
 ```
 
 If you set the **Record Key** as the environment variable `CYPRESS_RECORD_KEY`,
-you can omit the `--key` flag. You'd typically set this environment variable
+you can omit the `--key` flag. You may want to set this environment variable
 when running in
 [Continuous Integration](/app/continuous-integration/overview).
 
@@ -585,55 +611,27 @@ Cypress Cloud will display any tags sent with the appropriate run.
   alt="Cypress run in Cypress Cloud displaying flags"
 />
 
+:::info
+
+**App Quality Profiles**: If you use Cypress Cloud's [accessibility](/accessibility/get-started/introduction) and [UI Coverage reporting](/accessibility/get-started/introduction), a run tag can be mapped to [App Quality Profiles](/accessibility/configuration/profiles) to automatically apply different configuration settings for different types of runs.
+:::
+
 #### Exit code
 
-When Cypress finishes running tests, it exits. If there are no failed tests, the
-exit code will be 0.
+Cypress supports two different exit code behaviors. The default behavior is similar to that of Mocha, but is not POSIX compliant: reserved exit codes can be returned for certain conditions. As well, the default behavior
+can return a false negative when there are a number of tests that fail in multiples of 256: most terminals will apply modulo 256 to any exit code larger than 255.
 
-```text
-## All tests pass
-$ cypress run
-...
-                                        Tests  Passing  Failing
-    ✔  All specs passed!      00:16       17       17        0
+POSIX compliant exit codes are available via the `--posix-exit-codes` flag. When this flag is passed, additional conditions can be returned that are not possible with the default behavior, including when Cypress fails due to
+network errors when connections to Cypress Cloud are required, such as in `--record` or `--parallel` runs.
 
-## print exit code on Mac or Linux
-$ echo $?
-0
-```
+When using POSIX compliant exit codes, the number of failed tests can be determined from the [Module API](/app/references/module-api) or [structured reporter data](/app/tooling/reporters).
 
-If there are any test failures, then the exit code will match the number of
-tests that failed.
-
-```text
-## Spec with two failing tests
-$ cypress run
-...
-                                        Tests  Passing  Failing
-    ✖  1 of 1 failed (100%)   00:22       17       14        2
-
-## print exit code on Mac or Linux
-$ echo $?
-2
-```
-
-If Cypress could not run for some reason (for example if no spec files were
-found) then the exit code will be 1.
-
-```text
-## No spec files found
-$ cypress run --spec not-found.js
-...
-Can't run because no spec files were found.
-
-We searched for any files matching this glob pattern:
-
-not-found.js
-
-## print exit code on Mac or Linux
-$ echo $?
-1
-```
+| Exit Condition                                                                              | POSIX Exit Code (with `--posix-exit-codes`) | Default Exit Code (without `--posix-exit-codes`) |
+| ------------------------------------------------------------------------------------------- | ------------------------------------------- | ------------------------------------------------ |
+| All tests pass                                                                              | 0                                           | 0                                                |
+| _n_ tests fail                                                                              | 1                                           | _n_                                              |
+| Cypress could not run due to a network error when connections to Cypress Cloud are required | 112                                         | 1                                                |
+| Cypress could not run for any other reason, including no spec files found                   | 1                                           | 1                                                |
 
 ### `cypress open`
 
@@ -663,7 +661,8 @@ be guided through selecting a browser, project, and/or testing type.
 | `--config-file`, `-C` | [Specify configuration file](#cypress-open-config-file-lt-configuration-file-gt)                                                                                                    |
 | `--detached`, `-d`    | Open Cypress in detached mode                                                                                                                                                       |
 | `--e2e`               | Open in end to end testing mode (default)                                                                                                                                           |
-| `--env`, `-e`         | [Specify environment variables](#cypress-open-env-lt-env-gt)                                                                                                                        |
+| `--env`, `-e`         | [Specify secret environment variables](#cypress-open-env-lt-env-gt)                                                                                                                 |
+| `--expose`, `-x`      | [Specify public configuration values](#cypress-open-expose-lt-expose-gt)                                                                                                            |
 | `--global`            | [Open in global mode](#cypress-open-global)                                                                                                                                         |
 | `--help`, `-h`        | Output usage information                                                                                                                                                            |
 | `--port`, `-p`        | [Override default port](#cypress-open-port-lt-port-gt)                                                                                                                              |
@@ -719,23 +718,39 @@ cypress open --config-file tests/cypress.config.js
 
 #### `cypress open --env <env>` {#cypress-open-env-lt-env-gt}
 
-Set Cypress [environment variables](/app/references/environment-variables).
+:::caution
+
+**Security Warning**
+
+Secrets passed via CLI may appear in CI logs. For production use, prefer setting secrets via your CI/CD platform's secret management system.
+
+:::
+
+Set secret [environment variables](/app/guides/environment-variables) for use in your tests via [`cy.env()`](/api/commands/env). See the [Environment Variables & Secrets](/app/guides/environment-variables) guide for more details.
 
 ```shell
-cypress open --env host=api.dev.local
+cypress open --env apiKey=secret-key-12345
 ```
 
 Pass several variables using commas and no spaces. Numbers are automatically
 converted from strings.
 
 ```shell
-cypress open --env host=api.dev.local,port=4222
+cypress open --env apiKey=secret-key-12345,apiUrl=https://api.example.com
 ```
 
 Pass an object as a JSON in a string.
 
 ```shell
-cypress open --env flags='{"feature-a":true,"feature-b":false}'
+cypress open --env credentials='{"apiKey":"secret-key-12345","dbPassword":"secure-password"}'
+```
+
+#### `cypress open --expose <expose>` {#cypress-open-expose-lt-expose-gt}
+
+Set public configuration values for use in your tests via [`Cypress.expose()`](/api/cypress-api/expose). See the [Environment Variables & Secrets](/app/guides/environment-variables) guide for more details.
+
+```shell
+cypress open --expose apiVersion=v2,featureFlag=true
 ```
 
 #### `cypress open --global` {#cypress-open-global}
@@ -973,9 +988,11 @@ and with Windows CMD and PowerShell terminal windows.
 
 ## History
 
-| Version                                    | Changes                                                    |
-| ------------------------------------------ | ---------------------------------------------------------- |
-| [12.6.0](/app/references/changelog#12-6-0) | Added `--auto-cancel-after-failures` flag to `cypress run` |
-| [5.4.0](/app/references/changelog)         | Added `prune` subcommand to `cypress cache`                |
-| [5.4.0](/app/references/changelog)         | Added `--size` flag to `cypress cache list` subcommand     |
-| [4.9.0](/app/references/changelog)         | Added `--quiet` flag to `cypress run`                      |
+| Version                                    | Changes                                                               |
+| ------------------------------------------ | --------------------------------------------------------------------- |
+| [15.5.0](/app/references/changelog#15-5-0) | Added the 112 exit code scenario when using `--posix-exit-codes` flag |
+| [15.4.0](/app/references/changelog#15-4-0) | Added `--posix-exit-codes` flag to `cypress run`                      |
+| [12.6.0](/app/references/changelog#12-6-0) | Added `--auto-cancel-after-failures` flag to `cypress run`            |
+| [5.4.0](/app/references/changelog)         | Added `prune` subcommand to `cypress cache`                           |
+| [5.4.0](/app/references/changelog)         | Added `--size` flag to `cypress cache list` subcommand                |
+| [4.9.0](/app/references/changelog)         | Added `--quiet` flag to `cypress run`                                 |

@@ -10,6 +10,7 @@ import ComponentOnlyBadge from "@site/src/components/component-only-badge";
 import TestReplayInfo from "@site/docs/partials/_test-replay-info.mdx";
 import CypressConfigFileTabs from "@site/src/components/cypress-config-file-tabs";
 import CypressInstallCommands from "@site/docs/partials/_cypress-install-commands.mdx";
+import CypressEnvVsCypressExpose from "@site/docs/partials/_cy-env-vs-cypress-expose.mdx";
 import CypressOpenCommands from "@site/docs/partials/_cypress-open-commands.mdx";
 import CypressRunCommands from "@site/docs/partials/_cypress-run-commands.mdx";
 import DefaultSelectorPriority from "@site/docs/partials/_default-selector-priority.mdx";
@@ -28,6 +29,7 @@ import Icon from "@site/src/components/icon";
 import ImportMountFunctions from "@site/docs/partials/_import-mount-functions.mdx";
 import IntellisenseCodeCompletion from "@site/docs/partials/_intellisense-code-completion.mdx";
 import ProductHeading from "@site/src/components/product-heading";
+import Profiles from "@site/docs/partials/_profiles.mdx";
 import SignificantAttributes from "@site/docs/partials/_significantattributes.mdx";
 import SourceMaps from "@site/docs/partials/_source-maps.mdx";
 import SupportFileConfiguration from "@site/docs/partials/_support-file-configuration.mdx";
@@ -44,6 +46,7 @@ import CloudFreePlan from "@site/docs/partials/_cloud_free_plan.mdx";
 import CiProviderCloudSteps from "@site/docs/partials/_ci_provider_cloud_steps.mdx";
 import UrlAllowList from "@site/docs/partials/_url_allowlist.mdx";
 import UICovPremiumNote from "@site/docs/partials/_ui-coverage-premium-note.mdx";
+import ResultsApiEnvVars from "@site/docs/partials/_results-api-env-vars.mdx";
 
 // Font Awesome
 import { library } from '@fortawesome/fontawesome-svg-core'
@@ -173,6 +176,7 @@ export default {
   ComponentOnlyBadge,
   CypressConfigFileTabs,
   CypressInstallCommands,
+  CypressEnvVsCypressExpose,
   CypressOpenCommands,
   CypressRunCommands,
   DefaultSelectorPriority,
@@ -191,6 +195,7 @@ export default {
   ImportMountFunctions,
   IntellisenseCodeCompletion,
   ProductHeading,
+  Profiles,
   SignificantAttributes,
   SourceMaps,
   SupportFileConfiguration,
@@ -208,4 +213,5 @@ export default {
   CiProviderCloudSteps,
   UrlAllowList,
   UICovPremiumNote,
+  ResultsApiEnvVars,
 }
