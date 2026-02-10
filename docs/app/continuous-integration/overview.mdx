@@ -165,7 +165,7 @@ the server like this:
 }
 ```
 
-When working with local `https` in webpack, set an environment variable to allow
+When working with local `https` in webpack, set a system environment variable to allow
 local certificate:
 
 ```json
@@ -523,18 +523,12 @@ Typically you'd set this inside of your CI provider.
 
 #### Git information
 
-Cypress uses the
-[@cypress/commit-info](https://github.com/cypress-io/commit-info) package to
-extract git information to associate with the run (e.g. branch, commit message,
-author).
-
-It assumes there is a `.git` folder and uses Git commands to get each property,
-like `git show -s --pretty=%B` to get commit message, see
-[src/git-api.js](https://github.com/cypress-io/commit-info/blob/master/src/git-api.js).
+Cypress assumes there is a `.git` folder and uses Git commands to get each property,
+like `git show -s --pretty=%B` to get the commit message.
 
 Under some environment setups (e.g. `docker`/`docker-compose`) if the `.git`
 directory is not available or mounted, you can pass all git related information
-under custom environment variables.
+under custom system environment variables.
 
 - Branch: `COMMIT_INFO_BRANCH`
 - Message: `COMMIT_INFO_MESSAGE`
@@ -546,16 +540,16 @@ under custom environment variables.
 If the commit information is missing in the Cypress Cloud run then
 [GitHub Integration](/cloud/integrations/source-control/github) or other
 tasks might not work correctly. To see the relevant Cypress debug logs, set the
-environment variable `DEBUG` on your CI machine and inspect the terminal output
+system environment variable `DEBUG` on your CI machine and inspect the terminal output
 to see why the commit information is unavailable.
 
 ```shell
-DEBUG=commit-info,cypress:server:record
+DEBUG=cypress:server:record
 ```
 
 #### CI Build Information
 
-In some newer CI providers, Cypress can't map the environment variables required
+In some newer CI providers, Cypress can't map the system environment variables required
 to link back to builds or pull requests. In this case we provided users some
 environment variables to help pass that information along.
 
@@ -569,7 +563,7 @@ appropriate place.
 #### Custom Environment Variables
 
 You can also set custom environment variables for use in your tests. These
-enable your code to reference dynamic values.
+enable your test code and browser to reference dynamic values.
 
 ```shell
 export "EXTERNAL_API_SERVER=https://corp.acme.co"
@@ -580,7 +574,7 @@ And then in your tests:
 ```javascript
 cy.request({
   method: 'POST',
-  url: Cypress.env('EXTERNAL_API_SERVER') + '/users/1',
+  url: Cypress.expose('EXTERNAL_API_SERVER') + '/users/1',
   body: {
     foo: 'bar',
     baz: 'quux',
@@ -589,7 +583,7 @@ cy.request({
 ```
 
 Refer to the dedicated
-[Environment Variables Guide](/app/references/environment-variables) for more
+[Environment Variables & Secrets guide](/app/guides/environment-variables) for more
 examples.
 
 ### Module API
@@ -666,7 +660,7 @@ the tools below should be available.
 Xvfb :99 &
 ```
 
-Second, set the X11 address in an environment variable
+Second, set the X11 address in a system environment variable
 
 ```shell
 export DISPLAY=:99

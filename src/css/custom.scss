@@ -1,16 +1,9 @@
 /* https://dev.to/sajclarke_62/using-tailwindcss-v3-in-docusaurus-in-5-steps-5c26 */
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/**
- * Any CSS included here will be global. The classic template
- * bundles Infima by default. Infima is a CSS framework designed to
- * work well for content-centric websites.
- */
-
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@500;700&display=swap');
 @import './announcement-bar.scss';
 @import './markdown.scss';
 @import './sidebar.scss';
@@ -19,6 +12,16 @@
 @import './embeds.scss';
 @import './table-of-contents.scss';
 @import './docsearch.scss';
+
+/**
+ * Any CSS included here will be global. The classic template
+ * bundles Infima by default. Infima is a CSS framework designed to
+ * work well for content-centric websites.
+ */
+
+// CSS @import for external fonts (not deprecated - these are CSS imports, not Sass imports)
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@500;700&display=swap');
 
 /* You can override the default Infima variables here. */
 :root {
@@ -122,7 +125,6 @@
   --ifm-heading-font-family: Poppins;
   --ifm-heading-font-weight: var(--ifm-font-weight-bold);
   --ifm-line-height-base: 1.6;
-  --ifm-heading-color: theme(colors.gray.1000) --ifm-code-font-size: 95%;
   --ifm-pre-line-height: 1.5em;
 
   --ifm-code-background-color: #282a36;
@@ -293,19 +295,16 @@ html[data-theme='dark'] {
   }
 }
 
-div[class^='announcementBar'] {
-  font-size: 1rem;
-  font-weight: var(--ifm-font-weight-semibold);
-  border-bottom: none;
-}
+.alert.alert--secondary {
+  background-color: var(--ifm-color-indigo-50);
+  color: var(--ifm-color-indigo-1000);
+  --ifm-alert-border-color: var(--ifm-color-indigo-400);
 
-div[class^='announcementBar'] div[class^='content'] {
-  font-size: 1rem;
-  border-bottom: none;
-}
-
-div[class^='announcementBar'] .close {
-  margin-right: 1rem;
+  [data-theme='dark'] & {
+    background-color: var(--ifm-color-indigo-1000);
+    color: var(--ifm-color-indigo-50);
+    --ifm-alert-border-color: var(--ifm-color-indigo-800);
+  }
 }
 
 /* Font Awesome Icons */

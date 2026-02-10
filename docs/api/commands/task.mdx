@@ -420,7 +420,7 @@ cy.task('queryDatabase', { dbName, query })
 ```ts
 import mysql from 'mysql'
 // the connection strings for different databases could
-// come from the Cypress configuration or from environment variables
+// come from system environment variables
 const connections = {
   stagingA: {
     host: 'staging.my.co',
@@ -501,6 +501,46 @@ on('task', {
     // do something with the date
     // and return it back
     return d
+  },
+})
+```
+
+:::
+
+### Accessing secrets securely
+
+You can use `cy.task()` to securely access secrets at runtime when they aren't available during configuration. Using `cy.task()` may be useful when secrets are retrieved from external secret managers or APIs that aren't available at configuration time.
+
+[cy.env()](/api/commands/env) is the preferred way to access secrets securely and use them in your tests, and is recommended for secrets that are available at configuration time.
+
+```javascript
+// in test - executes at runtime
+cy.task('getSecret', 'API_KEY').then((apiKey) => {
+  cy.request({
+    method: 'POST',
+    url: 'https://api.example.com/data',
+    headers: {
+      Authorization: `Bearer ${apiKey}`,
+    },
+  })
+})
+```
+
+:::cypress-config-plugin-example
+
+```ts
+// Task definition - executes when cy.task() is called in tests
+on('task', {
+  getSecret(secretName: string) {
+    // This reads from process.env at runtime, not at configuration time
+    // Useful when secrets are fetched dynamically or only needed conditionally
+    const secret = process.env[secretName]
+
+    if (!secret) {
+      throw new Error(`Secret ${secretName} is not set`)
+    }
+
+    return secret
   },
 })
 ```
