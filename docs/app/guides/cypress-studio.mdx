@@ -1,6 +1,6 @@
 ---
-title: 'Cypress Studio AI: Build Tests by Interacting with Your App'
-description: 'Create, extend, and refine Cypress tests with AI-powered recommendations without writing commands by hand.'
+title: 'Cypress Studio AI: AI-Powered Test Recording and Recommendations'
+description: 'Create and extend Cypress E2E tests with AI-driven assertion recommendations. Record interactions, get smart suggestions, and build tests for quality and reliability without writing every command by hand.'
 sidebar_label: 'Cypress Studio AI'
 e2eSpecific: true
 sidebar_custom_props: { 'new_label': true }
@@ -14,26 +14,18 @@ sidebar_custom_props: { 'new_label': true }
 
 ##### <Icon name="question-circle" color="#4BBFD2" /> What you'll learn
 
-- How to generate Cypress tests by interacting with your app
-- How AI automatically suggests relevant assertions as you record
+- How to generate Cypress tests by recording interactions in your app
 - How to add assertions by right-clicking elements
-- How to quickly extend or edit tests without leaving Cypress
+- How to extend and edit tests without leaving the Cypress app
+- How AI recommendations can suggest additional assertions as you record
+- What AI features require and how to manage or disable them
 
 :::
 
-## Why Use Cypress Studio
+## Why use Cypress Studio
 
 Cypress Studio turns test creation into a natural part of exploring your app.  
 Instead of manually typing every `.get()`, `.click()`, or `.type()` command, you can **record interactions in real time**, automatically generate Cypress code, and fine-tune your test inline.
-
-### Powered by AI
-
-With **Cypress Studio AI**, intelligent recommendations appear automatically as you record. The AI analyzes your interactions and suggests the most relevant assertions for each step, helping you build more comprehensive tests with less effort.
-
-- **Save time**: Skip manually typing `.get().click().type()` sequences
-- **Stay in the flow**: Build and extend tests without leaving the Cypress App
-- **Boost coverage**: Add new checks to existing tests in seconds
-- **AI-powered insights**: Get intelligent assertion recommendations as you interact with your app
 
 <DocsVideo
   src="/img/app/cypress-studio/cypress-studio-recording-assertions-editing.mp4"
@@ -44,25 +36,17 @@ With **Cypress Studio AI**, intelligent recommendations appear automatically as 
 
 :::success
 
-1. **Enable Studio:**  
-   Add to your `cypress.config.js` (Cypress Studio is currently experimental):
-
-   ```js
-   {
-     e2e: {
-       experimentalStudio: true
-     }
-   }
-   ```
-
-2. **Run a Spec:**
+1. **Run a Spec:**
    Open Cypress, run a spec file, and click New Test or Edit in Studio.
 
-3. **Interact & Get AI Recommendations:**
-   Click, type, and watch as AI automatically suggests relevant assertions in the Studio Panel. Accept or reject recommendations as you build your test.
+2. **Record Interactions:**
+   Click, type, and navigate in your app. Studio translates each action into a Cypress command in real time, showing you the generated code in the Studio Panel.
 
-4. **Save Your Test:**
-   Click Save to save your test with all the AI-suggested assertions.
+3. **Get AI Recommendations:**
+   Watch as AI automatically suggests relevant assertions in the Studio Panel. Accept or reject recommendations as you build your test.
+
+3. **Save Your Test:**
+   Click Save to write the generated commands and assertions to your spec file.
 
 :::
 
@@ -95,6 +79,8 @@ The AI Suggests assertions based on changes within your App after interactions o
 - **Text validation**: Verify text content matches expectations
 - **Form validation**: Check input values, selections, and form states
 - **Element properties**: Validate attributes, classes, and other properties
+- **URL validation**: Ensure the current URL matches expectations
+- **Title validation**: Verify the page title matches expectations
 
 ### Start Studio
 
@@ -189,7 +175,7 @@ Want more control? Use the [`Cypress.ElementSelector`](/api/cypress-api/element-
 - Cannot record across [multiple
   origins](/app/guides/cross-origin-testing).
 - Studio cannot load when running in open mode with `@cypress/grep`. You will see an error in this case. Remove any `--grep` flags from your command during `cypress open` to use Studio.
-- See issues labeled with [`experiment: studio`](https://github.com/cypress-io/cypress/issues?q=is%3Aissue%20state%3Aopen%20label%3A%22experiment%3A%20studio%22) for other known issues.
+- See issues labeled with [`topic: studio`](https://github.com/cypress-io/cypress/issues?q=is%3Aissue%20state%3Aopen%20label%3A%22topic%3A%20studio%22) for other known issues.
 
 :::note
 
@@ -230,7 +216,7 @@ Because Cypress Studio AI uses AI under the hood, it needs to communicate secure
 
 ## Pricing & usage limits
 
-During the experimental release, access will be provided at no additional charge. Users are limited by the number of AI recommendations they can receive per hour. This limit is higher for paid accounts and lower for free accounts. Our intention is to not limit normal usage of the feature.
+During the beta release, access will be provided at no additional charge. Users are limited by the number of AI recommendations they can receive per hour. This limit is higher for paid accounts and lower for free accounts. Our intention is to not limit normal usage of the feature.
 
 :::note
 
