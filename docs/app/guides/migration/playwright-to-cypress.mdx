@@ -8,7 +8,7 @@ sidebar_label: Migrating from Playwright
 
 # Migrating from Playwright to Cypress
 
-This guide helps you migrate from Playwright to Cypress.
+This guide helps you migrate tests from Playwright to Cypress.
 
 ::::info
 
@@ -17,7 +17,11 @@ This guide helps you migrate from Playwright to Cypress.
 - How common Playwright patterns translate to Cypress
 - How Cypress retry-ability changes the way you wait
 - Network stubbing/mocking with `cy.intercept()`
-- How to handle auth state, cross-origin, and other gotchas
+- How to reuse auth state
+- How to handle cross-origin testing and multi-tab workflows
+- Generating tests and capturing artifacts
+- CI parallelization and Smart Orchestration concepts
+- Component Testing comparisons
 
 ::::
 
@@ -55,7 +59,7 @@ describe('Authorization', () => {
 })
 ```
 
-## Execution model: `async/await` vs Cypress command queue
+## Execution model
 
 Playwright code typically awaits each action. Cypress commands are enqueued and retried automatically.
 
@@ -166,6 +170,17 @@ await page.getByRole('menuitem', { name: 'Settings' }).click()
 cy.get('[data-testid="menu"]').trigger('mouseover')
 cy.contains('[role="menuitem"]', 'Settings').click()
 ```
+
+### Mobile viewport testing
+
+<Badge type="success">Cypress</Badge>
+
+```ts
+cy.viewport('iphone-x')
+cy.visit('/')
+```
+
+See [`cy.viewport()`](/api/commands/viewport).
 
 ## Assertions
 
@@ -278,7 +293,7 @@ cy.intercept('GET', '/api/projects', {
 <Badge type="danger">Before: Playwright</Badge>
 
 ```ts
-await page.route('**/api/profile', async (route, request) => {
+await page.route('**/api/profile', async (route) => {
   const response = await route.fetch()
   const json = await response.json()
   json.plan = 'enterprise'
@@ -370,11 +385,12 @@ See [`cy.origin()`](/api/commands/origin).
 
 ## Multiple tabs / multiple windows
 
-Cypress does not control multiple browsers at the same time. For guidance and workarounds, see the [`@cypress/puppeteer`](https://www.npmjs.com/package/@cypress/puppeteer) plugin.
+Cypress can use the [`@cypress/puppeteer`](https://www.npmjs.com/package/@cypress/puppeteer) plugin to handle multi-tab workflows.
 
 <Badge type="danger">Before: Playwright</Badge>
 
 ```ts
+// Start waiting for the new tab before clicking.
 const newPagePromise = page.context().waitForEvent('page')
 await page.getByText('open new tab').click()
 const newPage = await newPagePromise
@@ -432,6 +448,21 @@ In your support file, import the command once:
 // cypress/support/e2e.ts
 import '@cypress/puppeteer/support'
 ```
+
+## Test generation
+
+Cypress can generate tests from the runner via [Cypress Studio](/app/guides/cypress-studio).
+
+## Screenshots and videos
+
+<Badge type="success">Cypress examples</Badge>
+
+```ts
+cy.screenshot('after-signup')
+cy.get('[data-testid="toast"]').screenshot('toast')
+```
+
+See [Screenshots and Videos](/app/guides/screenshots-and-videos).
 
 ## File upload and downloads
 
@@ -499,6 +530,11 @@ When you use Cypress Cloud, you can also enable **Smart Orchestration** features
 - **Load Balancing**: distributes specs across machines based on **previous run durations** to minimize overall run time. This is different from Playwright's `--shard` approach, which is a fixed split you define up front. See [Load Balancing](/cloud/features/smart-orchestration/load-balancing).
 - **Spec Prioritization**: runs specs that failed in the previous run first. See [Spec Prioritization](/cloud/features/smart-orchestration/spec-prioritization).
 - **Auto Cancellation**: cancels a run early after failures to avoid spending CI time on a run that can’t pass. See [Auto Cancellation](/cloud/features/smart-orchestration/run-cancellation).
+
+For CI debugging and quality tracking, see:
+
+- [Test Replay](/cloud/features/test-replay)
+- [Flaky Test Management](/cloud/features/flaky-test-management)
 
 <Badge type="danger">Before: Playwright</Badge>
 
