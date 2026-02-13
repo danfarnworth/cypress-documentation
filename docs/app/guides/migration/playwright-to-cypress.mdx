@@ -59,27 +59,6 @@ describe('Authorization', () => {
 })
 ```
 
-## Cheat sheet
-
-| Playwright                                                       | Cypress                                                              |
-| ---------------------------------------------------------------- | -------------------------------------------------------------------- |
-| `await page.goto('/path')`                                       | `cy.visit('/path')`                                                  |
-| `page.locator('css')`                                            | `cy.get('css')`                                                      |
-| `page.getByTestId('x')`                                          | `cy.get('[data-testid=\"x\"]')`                                      |
-| `await locator.click()`                                          | `cy.get(...).click()`                                                |
-| `await locator.fill('text')`                                     | `cy.get(...).clear().type('text')`                                   |
-| `await expect(locator).toHaveText('Saved!')`                     | `cy.get(...).should('have.text', 'Saved!')`                          |
-| `await expect(locator).toHaveAttribute('aria-expanded', 'true')` | `cy.get(...).should('have.attr', 'aria-expanded', 'true')`           |
-| `await expect(locator).toBeChecked()`                            | `cy.get(...).should('be.checked')`                                   |
-| `await expect(locator).toBeDisabled()`                           | `cy.get(...).should('be.disabled')`                                  |
-| `await expect(locator).toBeVisible()`                            | `cy.get(...).should('be.visible')`                                   |
-| `await expect(page).toHaveURL(/re/)`                             | `cy.url().should('match', /re/)`                                     |
-| `page.getByRole('button', { name: 'Save' })`                     | `cy.findByRole('button', { name: 'Save' })`                          |
-| `page.route('**/api', ...)`                                      | `cy.intercept('/api', ...)`                                          |
-| `await page.waitForResponse(...)`                                | `cy.intercept(...).as('x'); cy.wait('@x')`                           |
-| `await page.setInputFiles('input[type=file]', 'file.png')`       | `cy.get('input[type=file]').selectFile('file.png')` |
-| `use: { storageState: 'state.json' }`                            | `cy.session('user', login)`                                          |
-
 ## Execution model
 
 Playwright code typically awaits each action. Cypress commands are enqueued and retried automatically.
@@ -635,4 +614,23 @@ describe('Button', () => {
 
 See [Component Testing](/app/component-testing/get-started) and [`cy.mount()`](/api/commands/mount).
 
+## Cheat sheet
 
+| Playwright                                                       | Cypress                                                              |
+| ---------------------------------------------------------------- | -------------------------------------------------------------------- |
+| `await page.goto('/path')`                                       | `cy.visit('/path')`                                                  |
+| `page.locator('css')`                                            | `cy.get('css')`                                                      |
+| `page.getByTestId('x')`                                          | `cy.get('[data-testid=\"x\"]')`                                      |
+| `await locator.click()`                                          | `cy.get(...).click()`                                                |
+| `await locator.fill('text')`                                     | `cy.get(...).clear().type('text')`                                   |
+| `await expect(locator).toHaveText('Saved!')`                     | `cy.get(...).should('have.text', 'Saved!')`                          |
+| `await expect(locator).toHaveAttribute('aria-expanded', 'true')` | `cy.get(...).should('have.attr', 'aria-expanded', 'true')`           |
+| `await expect(locator).toBeChecked()`                            | `cy.get(...).should('be.checked')`                                   |
+| `await expect(locator).toBeDisabled()`                           | `cy.get(...).should('be.disabled')`                                  |
+| `await expect(locator).toBeVisible()`                            | `cy.get(...).should('be.visible')`                                   |
+| `await expect(page).toHaveURL(/re/)`                             | `cy.url().should('match', /re/)`                                     |
+| `page.getByRole('button', { name: 'Save' })`                     | `cy.findByRole('button', { name: 'Save' })`                          |
+| `page.route('**/api', ...)`                                      | `cy.intercept('/api', ...)`                                          |
+| `await page.waitForResponse(...)`                                | `cy.intercept(...).as('x'); cy.wait('@x')`                           |
+| `await page.setInputFiles('input[type=file]', 'file.png')`       | `cy.get('input[type=file]').selectFile('file.png')` |
+| `use: { storageState: 'state.json' }`                            | `cy.session('user', login)`                                          |
