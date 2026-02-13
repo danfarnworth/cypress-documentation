@@ -453,9 +453,16 @@ import '@cypress/puppeteer/support'
 
 Cypress can generate tests from the runner via [Cypress Studio](/app/guides/cypress-studio).
 
-## Screenshots and videos
+## Screenshots
 
-<Badge type="success">Cypress examples</Badge>
+<Badge type="danger">Before: Playwright</Badge>
+
+```ts
+await page.screenshot({ path: 'after-signup.png' })
+await page.locator('[data-testid="toast"]').screenshot({ path: 'toast.png' })
+```
+
+<Badge type="success">After: Cypress</Badge>
 
 ```ts
 cy.screenshot('after-signup')
