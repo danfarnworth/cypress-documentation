@@ -1,0 +1,470 @@
+---
+title: 'Migrating from Playwright to Cypress: A Guide'
+description: 'Code-first Playwright to Cypress migration guide for end-to-end (E2E) testing: locators, actions, assertions, network stubbing, auth, and CI.'
+sidebar_label: Migrating from Playwright
+---
+
+<ProductHeading product="app" />
+
+# Migrating from Playwright to Cypress
+
+::::info
+
+##### <Icon name="question-circle" color="#4BBFD2" /> What you'll learn
+
+- How common Playwright patterns translate to Cypress
+- How Cypress retry-ability changes the way you wait
+- Network stubbing/mocking with `cy.intercept()`
+- How to handle auth state, cross-origin, and other gotchas
+
+::::
+
+## Quick conversion example
+
+<Badge type="danger">Before: Playwright Test (@playwright/test)</Badge>
+
+```ts
+import { test, expect } from '@playwright/test'
+
+test('signs up', async ({ page }) => {
+  await page.goto('/signup')
+  await page.getByLabel('Email').fill('user@email.com')
+  await page.getByLabel('Confirm Email').fill('user@email.com')
+  await page.getByLabel('Password').fill('testPassword1234')
+  await page.getByRole('button', { name: 'Create new account' }).click()
+
+  await expect(page).toHaveURL(/\/signup\/success$/)
+})
+```
+
+<Badge type="success">After: Cypress</Badge>
+
+```ts
+describe('Authorization', () => {
+  it('signs up', () => {
+    cy.visit('/signup')
+    cy.contains('label', 'Email').find('input').type('user@email.com')
+    cy.contains('label', 'Confirm Email').find('input').type('user@email.com')
+    cy.contains('label', 'Password').find('input').type('testPassword1234')
+    cy.contains('button', 'Create new account').click()
+
+    cy.url().should('match', /\/signup\/success$/)
+  })
+})
+```
+
+## Playwright Test runner vs Playwright library
+
+If you are using Playwright without `@playwright/test`, you may have code like this.
+
+<Badge type="danger">Before: Playwright library (any runner)</Badge>
+
+```ts
+import { chromium } from 'playwright'
+
+it('visits a page', async () => {
+  const browser = await chromium.launch()
+  const page = await browser.newPage()
+
+  await page.goto('https://example.cypress.io')
+  await page.getByRole('heading', { name: 'Kitchen Sink' }).click()
+
+  await browser.close()
+})
+```
+
+<Badge type="success">After: Cypress</Badge>
+
+```ts
+it('visits a page', () => {
+  cy.visit('https://example.cypress.io')
+  cy.contains('h1', 'Kitchen Sink').click()
+})
+```
+
+## Execution model: `async/await` vs Cypress command queue
+
+Playwright code typically awaits each action. Cypress commands are enqueued and retried automatically.
+
+<Badge type="danger">Before: Playwright</Badge>
+
+```ts
+await page.getByTestId('submit').click()
+await expect(page.getByTestId('toast')).toHaveText('Saved!')
+```
+
+<Badge type="success">After: Cypress</Badge>
+
+```ts
+cy.get('[data-testid="submit"]').click()
+cy.get('[data-testid="toast"]').should('have.text', 'Saved!')
+```
+
+See Cypress’s command model in the [Introduction to Cypress](/app/core-concepts/introduction-to-cypress#The-Cypress-Command-Queue).
+
+## Locators / selectors
+
+### Prefer stable selectors
+
+Use a stable selector strategy (often `data-*`) as described in Cypress [Best Practices](/app/core-concepts/best-practices#Selecting-Elements).
+
+<Badge type="danger">Before: Playwright</Badge>
+
+```ts
+await page.getByTestId('email').fill('user@email.com')
+await page.getByRole('button', { name: 'Sign in' }).click()
+```
+
+<Badge type="success">After: Cypress</Badge>
+
+```ts
+cy.get('[data-testid="email"]').type('user@email.com')
+cy.contains('button', 'Sign in').click()
+```
+
+### `getByRole()` / `getByLabel()` in Cypress (Testing Library)
+
+If you want `getByRole()`/`getByLabel()` ergonomics in Cypress, install [Cypress Testing Library](https://github.com/testing-library/cypress-testing-library).
+
+<Badge type="danger">Before: Playwright</Badge>
+
+```ts
+await page.getByRole('button', { name: 'Save' }).click()
+await page.getByLabel('First name').fill('Jane')
+```
+
+<Badge type="success">After: Cypress (with Cypress Testing Library)</Badge>
+
+```ts
+cy.findByRole('button', { name: 'Save' }).click()
+cy.findByLabelText('First name').type('Jane')
+```
+
+## Interactions
+
+### Click / type / clear
+
+<Badge type="danger">Before: Playwright</Badge>
+
+```ts
+await page.locator('#username').fill('jane')
+await page.locator('#password').fill('secret')
+await page.getByRole('button', { name: 'Log in' }).click()
+```
+
+<Badge type="success">After: Cypress</Badge>
+
+```ts
+cy.get('#username').clear().type('jane')
+cy.get('#password').clear().type('secret')
+cy.contains('button', 'Log in').click()
+```
+
+### Checkboxes / radios / selects
+
+<Badge type="danger">Before: Playwright</Badge>
+
+```ts
+await page.getByLabel('Subscribe').check()
+await page.getByLabel('Daily').check()
+await page.getByLabel('Country').selectOption('US')
+```
+
+<Badge type="success">After: Cypress</Badge>
+
+```ts
+cy.contains('label', 'Subscribe').find('input[type="checkbox"]').check()
+cy.contains('label', 'Daily').find('input[type="radio"]').check()
+cy.contains('label', 'Country').find('select').select('US')
+```
+
+### Hover
+
+Playwright has native hover APIs; Cypress has guidance for hover workarounds in [`cy.hover()`](/api/commands/hover).
+
+<Badge type="danger">Before: Playwright</Badge>
+
+```ts
+await page.getByTestId('menu').hover()
+await page.getByRole('menuitem', { name: 'Settings' }).click()
+```
+
+<Badge type="success">After: Cypress</Badge>
+
+```ts
+cy.get('[data-testid="menu"]').trigger('mouseover')
+cy.contains('[role="menuitem"]', 'Settings').click()
+```
+
+## Assertions
+
+### Visibility / existence
+
+<Badge type="danger">Before: Playwright</Badge>
+
+```ts
+await expect(page.getByText('Welcome')).toBeVisible()
+await expect(page.getByTestId('spinner')).toBeHidden()
+```
+
+<Badge type="success">After: Cypress</Badge>
+
+```ts
+cy.contains('Welcome').should('be.visible')
+cy.get('[data-testid="spinner"]').should('not.be.visible')
+```
+
+### Text / attributes / URL
+
+<Badge type="danger">Before: Playwright</Badge>
+
+```ts
+await expect(page.getByTestId('toast')).toHaveText('Saved!')
+await expect(page.getByRole('button', { name: 'Save' })).toBeDisabled()
+await expect(page).toHaveURL(/\/dashboard$/)
+```
+
+<Badge type="success">After: Cypress</Badge>
+
+```ts
+cy.get('[data-testid="toast"]').should('have.text', 'Saved!')
+cy.contains('button', 'Save').should('be.disabled')
+cy.url().should('match', /\/dashboard$/)
+```
+
+See Cypress assertions at [Assertions](/app/references/assertions).
+
+## Waiting, retries, and timeouts
+
+Playwright often uses explicit waits (for selectors, responses, or load states). Cypress will retry most DOM queries and assertions until they pass or time out.
+
+<Badge type="danger">Before: Playwright</Badge>
+
+```ts
+await page.getByRole('button', { name: 'Save' }).click()
+await page.waitForResponse('**/api/profile')
+await expect(page.getByTestId('toast')).toHaveText('Saved!')
+```
+
+<Badge type="success">After: Cypress</Badge>
+
+```ts
+cy.intercept('POST', '/api/profile').as('saveProfile')
+cy.contains('button', 'Save').click()
+cy.wait('@saveProfile')
+cy.get('[data-testid="toast"]').should('have.text', 'Saved!')
+```
+
+Learn more about Cypress retry-ability at [Retry-ability](/app/core-concepts/retry-ability).
+
+## Network spying and stubbing
+
+### Spy (assert a request happened)
+
+<Badge type="danger">Before: Playwright</Badge>
+
+```ts
+const [response] = await Promise.all([
+  page.waitForResponse('**/api/users'),
+  page.getByRole('button', { name: 'Load users' }).click(),
+])
+expect(response.ok()).toBeTruthy()
+```
+
+<Badge type="success">After: Cypress</Badge>
+
+```ts
+cy.intercept('GET', '/api/users').as('users')
+cy.contains('button', 'Load users').click()
+cy.wait('@users').its('response.statusCode').should('eq', 200)
+```
+
+### Stub a response (static)
+
+<Badge type="danger">Before: Playwright</Badge>
+
+```ts
+await page.route('**/api/projects', async (route) => {
+  await route.fulfill({
+    status: 200,
+    contentType: 'application/json',
+    body: JSON.stringify([{ id: '1' }, { id: '2' }]),
+  })
+})
+```
+
+<Badge type="success">After: Cypress</Badge>
+
+```ts
+cy.intercept('GET', '/api/projects', {
+  statusCode: 200,
+  body: [{ id: '1' }, { id: '2' }],
+}).as('projects')
+```
+
+### Modify a response (dynamic)
+
+<Badge type="danger">Before: Playwright</Badge>
+
+```ts
+await page.route('**/api/profile', async (route, request) => {
+  const response = await route.fetch()
+  const json = await response.json()
+  json.plan = 'enterprise'
+  await route.fulfill({ response, json })
+})
+```
+
+<Badge type="success">After: Cypress</Badge>
+
+```ts
+cy.intercept('GET', '/api/profile', (req) => {
+  req.continue((res) => {
+    res.body.plan = 'enterprise'
+  })
+}).as('profile')
+```
+
+See [Network Requests](/app/guides/network-requests) and [`cy.intercept()`](/api/commands/intercept).
+
+## Auth state reuse
+
+Playwright commonly reuses auth via `storageState`. In Cypress, use [`cy.session()`](/api/commands/session) to cache cookies and storage between tests.
+
+<Badge type="danger">Before: Playwright Test</Badge>
+
+```ts
+// playwright.config.ts
+// use: { storageState: 'storageState.json' }
+```
+
+<Badge type="success">After: Cypress</Badge>
+
+```ts
+const login = () => {
+  cy.visit('/login')
+  cy.get('#username').type('jane')
+  cy.get('#password').type('secret')
+  cy.contains('button', 'Log in').click()
+}
+
+beforeEach(() => {
+  cy.session('jane', login)
+})
+```
+
+## Cross-origin / multiple domains
+
+Playwright can navigate across origins freely. Cypress requires `cy.origin()` when interacting with multiple origins in one test.
+
+<Badge type="danger">Before: Playwright</Badge>
+
+```ts
+await page.goto('https://site-a.example')
+await page.goto('https://site-b.example')
+await expect(page.getByRole('banner')).toBeVisible()
+```
+
+<Badge type="success">After: Cypress</Badge>
+
+```ts
+cy.visit('https://site-a.example')
+cy.visit('https://site-b.example')
+cy.origin('https://site-b.example', () => {
+  cy.get('[role="banner"]').should('be.visible')
+})
+```
+
+See [`cy.origin()`](/api/commands/origin).
+
+## Multiple tabs / multiple windows
+
+Cypress does not control multiple browsers at the same time. For guidance and workarounds, see [Trade-offs](/app/references/trade-offs#Multiple-browsers-open-at-the-same-time) and the [`@cypress/puppeteer`](https://github.com/cypress-io/cypress/tree/develop/npm/puppeteer) plugin.
+
+## File upload and downloads
+
+### Upload
+
+<Badge type="danger">Before: Playwright</Badge>
+
+```ts
+await page.setInputFiles('input[type="file"]', 'fixtures/avatar.png')
+```
+
+<Badge type="success">After: Cypress</Badge>
+
+```ts
+cy.get('input[type="file"]').selectFile('cypress/fixtures/avatar.png')
+```
+
+See [`cy.selectFile()`](/api/commands/selectfile).
+
+### Downloads (basic pattern)
+
+Playwright can observe downloads directly. In Cypress, a common approach is to trigger the download, then assert the file exists in the configured downloads folder.
+
+<Badge type="danger">Before: Playwright</Badge>
+
+```ts
+const download = await page.waitForEvent('download')
+await page.getByRole('button', { name: 'Export CSV' }).click()
+const path = await download.path()
+```
+
+<Badge type="success">After: Cypress</Badge>
+
+```ts
+cy.contains('button', 'Export CSV').click()
+cy.readFile('cypress/downloads/export.csv', { timeout: 15000 }).should('exist')
+```
+
+## API testing
+
+<Badge type="danger">Before: Playwright</Badge>
+
+```ts
+// APIRequestContext (Playwright)
+const res = await request.get('/api/health')
+expect(res.ok()).toBeTruthy()
+```
+
+<Badge type="success">After: Cypress</Badge>
+
+```ts
+cy.request('/api/health').its('status').should('eq', 200)
+```
+
+See [`cy.request()`](/api/commands/request).
+
+## CI parallelization (conceptual mapping)
+
+Playwright often parallelizes via workers and/or sharding. Cypress Cloud parallelizes by spec file.
+
+<Badge type="danger">Before: Playwright Test</Badge>
+
+```sh
+playwright test --shard=1/4
+```
+
+<Badge type="success">After: Cypress (Cloud)</Badge>
+
+```sh
+cypress run --record --parallel
+```
+
+See [Parallelization](/cloud/features/smart-orchestration/parallelization).
+
+## Cheat sheet (common translations)
+
+| Playwright | Cypress |
+| --- | --- |
+| `await page.goto('/path')` | `cy.visit('/path')` |
+| `page.locator('css')` | `cy.get('css')` |
+| `page.getByTestId('x')` | `cy.get('[data-testid=\"x\"]')` |
+| `await locator.click()` | `cy.get(...).click()` |
+| `await locator.fill('text')` | `cy.get(...).clear().type('text')` |
+| `await expect(locator).toBeVisible()` | `cy.get(...).should('be.visible')` |
+| `await expect(page).toHaveURL(/re/)` | `cy.url().should('match', /re/)` |
+| `page.route('**/api', ...)` | `cy.intercept('/api', ...)` |
+| `await page.waitForResponse(...)` | `cy.intercept(...).as('x'); cy.wait('@x')` |
+
