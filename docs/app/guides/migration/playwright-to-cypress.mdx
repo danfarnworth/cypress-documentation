@@ -75,27 +75,11 @@ describe('Authorization', () => {
 
 Playwright code typically awaits each action and may use explicit waits for specific conditions. Cypress commands are enqueued and automatically retry assertions until they pass or timeout.
 
-**Key Conceptual Difference:**
-
-Playwright follows a traditional imperative model where you explicitly await each action:
-
-- Actions execute immediately when called
-- You can wait for conditions with `waitFor` methods (for example, `waitForSelector`, `waitForResponse`)
-
-Cypress follows a declarative model with built-in retry-ability:
-
-- Commands are enqueued and execute in order
-- Assertions automatically retry until timeout
-- DOM queries retry until elements exist and are actionable
-- This eliminates most explicit waits and reduces flaky tests
-
 **What this means for your tests:**
 
 - Playwright: explicit waits are available when you need them → Cypress: most DOM queries/assertions wait and retry by default
 - Playwright: `await page.waitForSelector(...)` → Cypress: `cy.get(...)` retries until it finds the element
 - Playwright: `await expect(locator)...` → Cypress: `cy.get(...).should(...)` retries automatically
-
-Learn more about Cypress [retry-ability](/app/core-concepts/retry-ability).
 
 <Badge type="danger">Before: Playwright</Badge>
 
@@ -111,6 +95,8 @@ await expect(page.getByTestId('toast')).toHaveText('Saved!')
 cy.get('[data-testid="submit"]').click()
 cy.get('[data-testid="toast"]').should('have.text', 'Saved!')
 ```
+
+Learn more about Cypress [retry-ability](/app/core-concepts/retry-ability).
 
 ## Async/Await vs Command Chaining
 
