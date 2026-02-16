@@ -49,8 +49,7 @@ await page.getByRole('button', { name: 'Create new account' }).click()
 // Assert navigation
 await expect(page).toHaveURL(/\/signup\/success$/)
 })
-
-````
+```
 
 <Badge type="success">After: Cypress</Badge>
 ```ts
@@ -58,12 +57,12 @@ describe('Authorization', () => {
   it('signs up', () => {
     // Navigate
     cy.visit('/signup')
-
+    
     // Fill form
     cy.get('[data-testid="email"]').type('user@email.com')
     cy.get('[data-testid="confirm-email"]').type('user@email.com')
     cy.get('[data-testid="password"]').type('testPassword1234')
-
+    
     // Submit
     cy.contains('button', 'Create new account').click()
 
@@ -71,7 +70,7 @@ describe('Authorization', () => {
     cy.url().should('match', /\/signup\/success$/)
   })
 })
-````
+```
 
 ## Execution model and retry-ability
 
@@ -517,7 +516,7 @@ await page
 
 See Playwright [Frames](https://playwright.dev/docs/frames).
 
-In Cypress, iframe support is more limited. If you need to test inside a third-party iframe, see the recipe [Testing iframes](https://github.com/cypress-io/cypress-example-recipes/tree/master/examples/blogs__iframes) and Cypress [Trade-offs](/app/references/trade-offs).
+In Cypress, iframe support is more limited. If you need to test inside a third-party iframe, see the recipe [Testing iframes](https://github.com/cypress-io/cypress-example-recipes/tree/master/examples/blogs__iframes).
 
 For Shadow DOM in Cypress, you can traverse explicitly:
 
@@ -712,7 +711,7 @@ Cypress.Commands.add('login', (username: string, password: string) => {
 
 See [Custom Commands](/api/cypress-api/custom-commands) for more details.
 
-## Configuration mapping (high level)
+## Configuration mapping
 
 <Badge type="danger">Before: Playwright</Badge>
 
@@ -745,32 +744,13 @@ export default defineConfig({
 })
 ```
 
-See [Cypress Configuration](/app/references/configuration) and Playwright [Configuration](https://playwright.dev/docs/test-configuration).
+See [Cypress Configuration](/app/references/configuration).
 
-## Filter and run a subset of tests
 
-<Badge type="danger">Before: Playwright</Badge>
-
-```sh
-# Filter by test title
-playwright test -g "add a todo item"
-
-# Re-run last failures
-playwright test --last-failed
-```
-
-<Badge type="success">After: Cypress</Badge>
-
-```sh
-# Run a specific spec file
-cypress run --spec "cypress/e2e/my-spec.cy.ts"
-```
-
-For title-based filtering in Cypress, see the recipe [Grep tests](https://github.com/cypress-io/cypress-example-recipes/tree/master/examples/preprocessors__grep) (Mocha-style grep).
 
 ## Cross-browser notes
 
-Playwright commonly runs browsers via projects (`--project=chromium|firefox|webkit`). Cypress runs browsers via the `--browser` flag (and supports WebKit as experimental).
+Playwright commonly runs browsers via projects (`--project=chromium|firefox|webkit`). Cypress runs browsers via the `--browser` flag.
 
 ```sh
 # Cypress
@@ -790,9 +770,13 @@ Playwright offers parallelization through workers.
 - You define the split strategy upfront
 
 <Badge type="danger">Before: Playwright</Badge>
-```sh # Split across 4 machines manually playwright test --shard=1/4 # Machine 1
-playwright test --shard=2/4 # Machine 2 playwright test --shard=3/4 # Machine 3
-playwright test --shard=4/4 # Machine 4 ```
+```sh
+# Split across 4 machines manually
+playwright test --shard=1/4  # Machine 1
+playwright test --shard=2/4  # Machine 2
+playwright test --shard=3/4  # Machine 3
+playwright test --shard=4/4  # Machine 4
+```
 
 Cypress parallelization works differently.
 
@@ -801,8 +785,11 @@ Cypress parallelization works differently.
 - No manual sharding required.
 
 <Badge type="success">After: Cypress Cloud</Badge>
-```sh # Cloud automatically distributes specs across machines cypress run
---record --parallel ``` ### Smart Orchestration in Cypress Cloud
+```sh
+# Cloud automatically distributes specs across machines
+cypress run --record --parallel 
+```
+### Smart Orchestration in Cypress Cloud
 
 When you use Cypress Cloud, you gain **Smart Orchestration** features that go beyond simple parallelization:
 
@@ -811,21 +798,18 @@ When you use Cypress Cloud, you gain **Smart Orchestration** features that go be
 - Distributes specs across machines based on **previous run durations**
 - Minimizes overall run time automatically
 - No need to manually configure shards or splits
-- Playwright equivalent: sharding is configured up front (`--shard=x/y`) and balancing depends on test structure and settings like `fullyParallel`. See Playwright [Sharding](https://playwright.dev/docs/test-sharding).
 
 **[Spec Prioritization](/cloud/features/smart-orchestration/spec-prioritization)**
 
 - Runs specs that failed in the previous run first
 - Provides faster feedback on fixes
 - Reduces time to detect persistent failures
-- Playwright equivalent: re-run last failures with `--last-failed`. See Playwright [Running tests](https://playwright.dev/docs/running-tests#run-last-failed-tests).
 
 **[Auto Cancellation](/cloud/features/smart-orchestration/run-cancellation)**
 
 - Cancels remaining specs after a threshold of failures
 - Avoids wasting CI time on runs that can't pass
 - Configurable failure thresholds
-- Playwright equivalent: fail fast with `--max-failures=N` (stops after N failures). See Playwright [CLI](https://playwright.dev/docs/test-cli).
 
 See [Parallelization](/cloud/features/smart-orchestration/parallelization) for setup details.
 
