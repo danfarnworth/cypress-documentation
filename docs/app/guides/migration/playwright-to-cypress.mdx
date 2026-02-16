@@ -101,7 +101,7 @@ cy.get('[data-testid="toast"]').should('have.text', 'Saved!')
 
 Learn more about Cypress [retry-ability](/app/core-concepts/retry-ability).
 
-## Async/Await vs Command Chaining
+## Async/await vs command chaining
 
 Playwright uses async/await patterns.
 
@@ -144,7 +144,7 @@ cy.get('[data-testid="email"]').type('user@email.com')
 cy.contains('button', 'Sign in').click()
 ```
 
-### `getByRole()` / `getByLabel()`
+### getByRole() and getByLabel()
 
 If you want `getByRole()`/`getByLabel()` ergonomics in Cypress, install [Cypress Testing Library](https://github.com/testing-library/cypress-testing-library).
 
@@ -230,7 +230,7 @@ await page.goto('/')
 <Badge type="success">After: Cypress</Badge>
 
 ```ts
-cy.viewport('iphone-x')
+cy.viewport(375, 812)
 cy.visit('/')
 ```
 
@@ -435,7 +435,7 @@ cy.origin('https://site-b.example', () => {
 })
 ```
 
-See [`cy.origin()`](/api/commands/origin).
+See [`cy.origin()`](/api/commands/origin) for complete documentation.
 
 ## Multiple tabs and windows
 
@@ -515,8 +515,6 @@ await page
   .getByTestId('pay-now')
   .click()
 ```
-
-See Playwright [Frames](https://playwright.dev/docs/frames).
 
 In Cypress, iframe support is more limited. If you need to test inside a third-party iframe, see the recipe [Testing iframes](https://github.com/cypress-io/cypress-example-recipes/tree/master/examples/blogs__iframes).
 
