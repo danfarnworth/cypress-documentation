@@ -14,15 +14,15 @@ This guide helps you migrate tests from Playwright to Cypress.
 
 ##### <Icon name="question-circle" color="#4BBFD2" /> What you'll learn
 
-- How common Playwright patterns translate to Cypress
-- How Cypress retry-ability changes the way you wait
-- Network stubbing/mocking with `cy.intercept()`
-- How to reuse auth state
-- How to handle cross-origin testing and multi-tab workflows
-- Generating tests and capturing artifacts
-- Configuration, filtering, and cross-browser run patterns
-- CI parallelization and Smart Orchestration concepts
-- Component Testing comparisons
+- How Playwright patterns translate to Cypress
+- Execution model and retry-ability (how 'waiting' changes)
+- Locators, actions, and assertions
+- Network stubbing/spying with `cy.intercept()`
+- Auth/session reuse, cross-origin, and multi-tab workflows
+- CI: sharding vs Cloud parallelization + Smart Orchestration
+- Debugging artifacts: screenshots/videos + Test Replay
+- Component Testing: framework/bundler support + mount vs `cy.mount()`
+- Migration patterns: page objects and custom commands
 
 ::::
 
@@ -78,9 +78,11 @@ Playwright code typically awaits each action and may use explicit waits for spec
 
 **What this means for your tests:**
 
-- Playwright: explicit waits are available when you need them → Cypress: most DOM queries/assertions wait and retry by default
-- Playwright: `await page.waitForSelector(...)` → Cypress: `cy.get(...)` retries until it finds the element
-- Playwright: `await expect(locator)...` → Cypress: `cy.get(...).should(...)` retries automatically
+| Playwright | Cypress |
+| --- | --- |
+| Explicit waits are available when you need them | Most DOM queries/assertions wait and retry by default |
+| `await page.waitForSelector(...)` | `cy.get(...)` retries until it finds the element |
+| `await expect(locator)...` | `cy.get(...).should(...)` retries automatically |
 
 <Badge type="danger">Before: Playwright</Badge>
 
