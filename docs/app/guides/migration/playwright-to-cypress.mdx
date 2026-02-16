@@ -132,8 +132,10 @@ await page.getByRole('button', { name: 'Log in' }).click()
 <Badge type="success">After: Cypress</Badge>
 
 ```ts
-cy.get('#username').clear().type('jane')
-cy.get('#password').clear().type('secret')
+cy.get('#username').clear()
+cy.get('#username').type('jane')
+cy.get('#password').clear()
+cy.get('#password').type('secret')
 cy.contains('button', 'Log in').click()
 ```
 
