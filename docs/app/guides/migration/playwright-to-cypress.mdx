@@ -1,6 +1,6 @@
 ---
-title: 'Migrating from Playwright to Cypress: A Guide'
-description: 'Playwright to Cypress migration guide for end-to-end (E2E) testing: locators, actions, assertions, network stubbing, auth, and CI.'
+title: 'Migrate from Playwright to Cypress: Complete Migration Guide'
+description: 'Step-by-step guide to migrate end-to-end tests from Playwright to Cypress. Compare syntax, learn retry-ability, network stubbing, auth patterns, CI parallelization, and Cloud features.'
 sidebar_label: Migrating from Playwright
 ---
 
@@ -59,7 +59,7 @@ describe('Authorization', () => {
 })
 ```
 
-## Execution model
+## Core difference: Execution model and retry-ability
 
 Playwright code typically awaits each action. Cypress commands are enqueued and retried automatically.
 
@@ -79,7 +79,7 @@ cy.get('[data-testid="toast"]').should('have.text', 'Saved!')
 
 See Cypress's command model in the [Introduction to Cypress](/app/core-concepts/introduction-to-cypress#The-Cypress-Command-Queue).
 
-## Locators / selectors
+## Locators and selectors
 
 ### Prefer stable selectors
 
@@ -119,7 +119,7 @@ cy.findByLabelText('First name').type('Jane')
 
 ## Interactions
 
-### Click / type / clear
+### Click, type, and clear
 
 <Badge type="danger">Before: Playwright</Badge>
 
@@ -139,7 +139,7 @@ cy.get('#password').type('secret')
 cy.contains('button', 'Log in').click()
 ```
 
-### Checkboxes / radios / selects
+### Checkboxes, radios, and selects
 
 <Badge type="danger">Before: Playwright</Badge>
 
@@ -186,7 +186,7 @@ See [`cy.viewport()`](/api/commands/viewport).
 
 ## Assertions
 
-### Visibility / existence
+### Visibility and existence
 
 <Badge type="danger">Before: Playwright</Badge>
 
@@ -202,7 +202,7 @@ cy.contains('Welcome').should('be.visible')
 cy.get('[data-testid="spinner"]').should('not.be.visible')
 ```
 
-### Text / attributes / URL
+### Text, attributes, and URL
 
 <Badge type="danger">Before: Playwright</Badge>
 
@@ -315,7 +315,7 @@ cy.intercept('GET', '/api/profile', (req) => {
 
 See [Network Requests](/app/guides/network-requests) and [`cy.intercept()`](/api/commands/intercept).
 
-## Auth state reuse
+## Authentication patterns
 
 Playwright commonly reuses auth via `storageState`. In Cypress, use [`cy.session()`](/api/commands/session) to cache cookies and storage between tests.
 
@@ -385,7 +385,7 @@ cy.origin('https://site-b.example', () => {
 
 See [`cy.origin()`](/api/commands/origin).
 
-## Multiple tabs / multiple windows
+## Multiple tabs and windows
 
 Cypress can use the [`@cypress/puppeteer`](https://www.npmjs.com/package/@cypress/puppeteer) plugin to handle multi-tab workflows.
 
@@ -473,7 +473,7 @@ cy.get('[data-testid="toast"]').screenshot('toast')
 
 See [Screenshots and Videos](/app/guides/screenshots-and-videos).
 
-## File upload and downloads
+## File uploads and downloads
 
 ### Upload
 
@@ -530,7 +530,7 @@ cy.request('/api/health').its('status').should('eq', 200)
 
 See [`cy.request()`](/api/commands/request).
 
-## CI parallelization (conceptual mapping)
+## CI parallelization
 
 Playwright often parallelizes via workers and/or sharding. Cypress Cloud parallelizes by spec file.
 
@@ -545,7 +545,7 @@ For CI debugging and quality tracking, see:
 - [Test Replay](/cloud/features/test-replay)
 - [Flaky Test Management](/cloud/features/flaky-test-management)
 
-### Test Replay vs Trace Viewer
+### Test Replay
 
 <Badge type="danger">Before: Playwright</Badge>
 
